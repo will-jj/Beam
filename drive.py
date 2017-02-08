@@ -1,17 +1,20 @@
+from __future__ import division
 import pygame
 from geometry_msgs.msg import Twist
 import rospy
 import sys
 
 pygame.init()
-
-pygame.display.set_mode((400, 400))
+win_x =1000
+win_y = 800 
+pygame.display.set_mode((win_x, win_y))
 
 pygame.key.set_repeat(100, 100)
 
-pub = rospy.Publisher('/beam/cmd_vel', Twist, queue_size=2)
+pub = rospy.Publisher('/cmd_vel', Twist, queue_size=2)
 rospy.init_node('vel', anonymous=True)
 rate = rospy.Rate(10)
+
 while not rospy.is_shutdown():
     pygame.event.poll()
     pressed = pygame.key.get_pressed()
@@ -29,8 +32,10 @@ while not rospy.is_shutdown():
     if pygame.mouse.get_pressed()[0]:
             lin = pygame.mouse.get_pos()[1]
             ang = pygame.mouse.get_pos()[0]
-            lin_vel = -(lin-200)/div
-            ang_vel = -(ang-200)/div
+            lin = -(lin-win_y/2)/win_y
+            ang = -(ang-win_x/2)/win_x
+            lin_vel = lin
+	    ang_vel = ang
 
     print 'cmd', lin_vel, ang_vel
     twist = Twist()
@@ -38,28 +43,3 @@ while not rospy.is_shutdown():
     twist.angular.z = ang_vel
     pub.publish(twist)
     rate.sleep()
- 
- 
- # -*- coding: utf-8 -*-
-"""
-Spyder Editor
-
-This is a temporary script file.
-"""
-
-import pygame
-import time
-
-pygame.init()
-
-pygame.display.set_mode((400, 400))
-
-while(1):
-    pygame.event.get()
-    if pygame.mouse.get_pressed()[0]:
-        lin = pygame.mouse.get_pos()[0]
-        ang = pygame.mouse.get_pos()[1]
-        lin = (lin-200)/400
-        ang = (ang+200)/400
-        print(lin,ang)
-    time.sleep(0.05)
