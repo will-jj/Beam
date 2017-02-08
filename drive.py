@@ -4,18 +4,39 @@ from geometry_msgs.msg import Twist
 import rospy
 import sys
 
+BLACK = (  0,   0,   0)
+WHITE = (255, 255, 255)
+BLUE =  (  0,   0, 255)
+GREEN = (  0, 255,   0)
+RED =   (255,   0,   0)
+STYLISH = (245, 255, 250)
 pygame.init()
-win_x =1000
-win_y = 800 
-pygame.display.set_mode((win_x, win_y))
+win_x =2000
+win_y = 1000 
+
+
+
+screen = pygame.display.set_mode((win_x, win_y))
+screen.fill(STYLISH)
 
 pygame.key.set_repeat(100, 100)
+pygame.draw.line(screen, BLACK, [win_x/2, 0], [win_x/2,win_y], 5)
+pygame.draw.line(screen, BLACK, [0, win_y/2], [win_x,win_y/2], 5)
+myfont = pygame.font.SysFont("monospace", 15)
 
+# render text
+label = myfont.render("Angular Velocity", 1, (BLACK))
+label2 = myfont.render("Linear Velocity", 1, (BLACK))
+label2 = pygame.transform.rotate(label2, 90)
+screen.blit(label, (win_x//2 +win_x//20,win_y//2-win_y//20))
+screen.blit(label2, (win_x//2 -win_x//20,win_y//2-win_y//5))
+pygame.display.flip()
 pub = rospy.Publisher('/cmd_vel', Twist, queue_size=2)
 rospy.init_node('vel', anonymous=True)
 rate = rospy.Rate(10)
 
 while not rospy.is_shutdown():
+
     pygame.event.poll()
     pressed = pygame.key.get_pressed()
     lin_vel = 0
@@ -35,7 +56,7 @@ while not rospy.is_shutdown():
             lin = -(lin-win_y/2)/win_y
             ang = -(ang-win_x/2)/win_x
             lin_vel = lin
-	    ang_vel = ang
+            ang_vel = ang
 
     print 'cmd', lin_vel, ang_vel
     twist = Twist()
